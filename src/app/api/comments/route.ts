@@ -6,6 +6,12 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+console.log("ENV CHECK", {
+    SUPABASE_URL: process.env.SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    HAS_SERVICE: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+});
+
 const MAGIC = process.env.MAGIC_TOKEN!;
 
 // --- super-light rate limit (per instance, per IP) ---
