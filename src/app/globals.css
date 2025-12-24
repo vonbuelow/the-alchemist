@@ -1,12 +1,17 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Core color system */
+  --background: #020b14; /* deep navy-black */
+  --foreground: #f2f6fb; /* soft white */
+
+  /* Accent colors (for consistency if you reuse later) */
+  --blue-dark: #003153;
+  --blue-hover: #89CFF0;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #020b14;
+    --foreground: #f2f6fb;
   }
 }
 
@@ -17,8 +22,8 @@ body {
 }
 
 body {
-  color: var(--foreground);
   background: var(--background);
+  color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
