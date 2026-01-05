@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "The Alchemist — Chapter Notes",
+  title: "The Alchemist — Week Notes",
   description: "Read and comment on chapters from The Alchemist",
 };
 

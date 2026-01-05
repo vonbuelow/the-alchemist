@@ -7,9 +7,8 @@ const supabaseAdmin = createClient(
 );
 
 console.log("ENV CHECK", {
-    SUPABASE_URL: process.env.SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    HAS_SERVICE: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+  NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+  HAS_SERVICE: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
 });
 
 const MAGIC = process.env.MAGIC_TOKEN!;
@@ -17,15 +16,14 @@ const MAGIC = process.env.MAGIC_TOKEN!;
 // --- super-light rate limit (per instance, per IP) ---
 type Bucket = { tokens: number; last: number };
 const buckets = new Map<string, Bucket>();
-const MAX_TOKENS = 10;        // allow 10 posts
-const REFILL_MS = 60_000;     // per minute
+const MAX_TOKENS = 10;
+const REFILL_MS = 60_000;
 
 function allowPost(ip: string) {
   const now = Date.now();
   const b = buckets.get(ip) ?? { tokens: MAX_TOKENS, last: now };
   const elapsed = now - b.last;
 
-  // refill proportional to time
   const refill = (elapsed / REFILL_MS) * MAX_TOKENS;
   b.tokens = Math.min(MAX_TOKENS, b.tokens + refill);
   b.last = now;
@@ -42,17 +40,20 @@ function allowPost(ip: string) {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const chapterStr = searchParams.get("chapter");
-  const chapter = Number(chapterStr);
+  const weekStr = searchParams.get("week");
+  const week = Number(weekStr);
 
-  if (!Number.isInteger(chapter) || chapter < 1) {
-    return NextResponse.json({ error: "Invalid chapter" }, { status: 400 });
+  if (!Number.isInteger(week) || week < 1 || week > 5) {
+    return NextResponse.json(
+      { error: "Invalid week. Must be between 1 and 5." },
+      { status: 400 }
+    );
   }
 
   const { data, error } = await supabaseAdmin
     .from("comments")
-    .select("id, chapter, name, text, created_at")
-    .eq("chapter", chapter)
+    .select("id, week, name, text, created_at")
+    .eq("week", week)
     .order("created_at", { ascending: true });
 
   if (error) {
@@ -78,8 +79,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { chapter, name, text, magic } = body as {
-    chapter: number;
+  const { week, name, text, magic } = body as {
+    week: number;
     name?: string;
     text: string;
     magic: string;
@@ -89,8 +90,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!Number.isInteger(chapter) || chapter < 1) {
-    return NextResponse.json({ error: "Invalid chapter" }, { status: 400 });
+  if (!Number.isInteger(week) || week < 1 || week > 5) {
+    return NextResponse.json(
+      { error: "Invalid week. Must be between 1 and 5." },
+      { status: 400 }
+    );
   }
 
   if (typeof text !== "string" || text.trim().length === 0) {
@@ -108,8 +112,8 @@ export async function POST(req: NextRequest) {
 
   const { data, error } = await supabaseAdmin
     .from("comments")
-    .insert([{ chapter, name: cleanName, text: text.trim() }])
-    .select("id, chapter, name, text, created_at")
+    .insert([{ week, name: cleanName, text: text.trim() }])
+    .select("id, week, name, text, created_at")
     .single();
 
   if (error) {
