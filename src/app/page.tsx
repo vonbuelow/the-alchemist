@@ -1,22 +1,17 @@
 import Link from "next/link";
 
-type ChapterLink = {
+type WeekLink = {
   num: number;
   label: string;
+  pages: string;
 };
 
-const chapters: ChapterLink[] = [
-  { num: 1, label: "Part One — Section 1" },
-  { num: 2, label: "Part One — Section 2" },
-  { num: 3, label: "Part One — Section 3" },
-  { num: 4, label: "Part One — Section 4" },
-  { num: 5, label: "Part Two — Section 5" },
-  { num: 6, label: "Part Two — Section 6" },
-  { num: 7, label: "Part Two — Section 7" },
-  { num: 8, label: "Part Two — Section 8" },
-  { num: 9, label: "Part Two — Section 9" },
-  { num: 10, label: "Part Two — Section 10" },
-  { num: 11, label: "Part Two — Section 11" },
+const weeks: WeekLink[] = [
+  { num: 1, label: "Week 1", pages: "pp. 1–36" },
+  { num: 2, label: "Week 2", pages: "pp. 37–72" },
+  { num: 3, label: "Week 3", pages: "pp. 73–108" },
+  { num: 4, label: "Week 4", pages: "pp. 109–144" },
+  { num: 5, label: "Week 5", pages: "pp. 145–171" },
 ];
 
 const DARK_BLUE = "#003153";
@@ -34,7 +29,7 @@ export default function Home() {
       }}
     >
       <style>{`
-        .chapter-card {
+        .week-card {
           display: block;
           border-radius: 16px;
           padding: 16px;
@@ -51,7 +46,7 @@ export default function Home() {
 
         /* Desktop hover */
         @media (hover: hover) and (pointer: fine) {
-          .chapter-card:hover {
+          .week-card:hover {
             background: ${HOVER_BLUE};
             transform: scale(1.035);
             box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
@@ -59,13 +54,13 @@ export default function Home() {
         }
 
         /* Touch / click feedback */
-        .chapter-card:active {
+        .week-card:active {
           background: ${HOVER_BLUE};
           transform: scale(0.98);
           box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
         }
 
-        .chapter-card:focus-visible {
+        .week-card:focus-visible {
           outline: 2px solid white;
           outline-offset: 4px;
         }
@@ -77,7 +72,7 @@ export default function Home() {
             The Alchemist — Book Club!
           </h1>
           <p style={{ marginTop: 10, fontSize: 16, opacity: 0.9 }}>
-            Pick a chapter and share your thoughts.
+            Pick a week and share your thoughts.
           </p>
         </header>
 
@@ -96,14 +91,14 @@ export default function Home() {
               gap: 14,
             }}
           >
-            {chapters.map((c) => (
+            {weeks.map((w) => (
               <Link
-                key={c.num}
-                href={`/chapter/${c.num}`}
-                className="chapter-card"
+                key={w.num}
+                href={`/week/${w.num}`}
+                className="week-card"
               >
                 <div style={{ fontSize: 12, opacity: 0.85 }}>
-                  Chapter {c.num}
+                  {w.label}
                 </div>
                 <div
                   style={{
@@ -112,7 +107,7 @@ export default function Home() {
                     marginTop: 6,
                   }}
                 >
-                  {c.label}
+                  {w.pages}
                 </div>
                 <div
                   style={{
@@ -131,7 +126,7 @@ export default function Home() {
         <footer style={{ marginTop: 18, fontSize: 12, opacity: 0.85 }}>
           <span>
             Tip: use your magic link once, then you can comment quickly on any
-            chapter.{" "}
+            week.{" "}
           </span>
           <a
             href="https://youtu.be/oHg5SJYRHA0?si=_Fokzf-0RF5iR7Dv"

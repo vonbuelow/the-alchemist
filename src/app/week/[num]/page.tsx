@@ -1,21 +1,31 @@
-// src/app/chapter/[num]/page.tsx
+// src/app/week/[num]/page.tsx
 "use client";
 
 import { use, useEffect, useMemo, useState } from "react";
 import { captureMagicFromUrl, getMagicToken } from "@/lib/magic";
+import Link from "next/link";
 
 type Comment = {
   id: string;
-  chapter: number;
+  week: number;
   name: string | null;
   text: string;
   created_at: string;
 };
 
-export default function ChapterPage({ params }: { params: Promise<{ num: string }> | { num: string } }) {
+const WEEK_INFO: Record<number, { label: string; pages: string }> = {
+  1: { label: "Week 1", pages: "pp. 1–36" },
+  2: { label: "Week 2", pages: "pp. 37–72" },
+  3: { label: "Week 3", pages: "pp. 73–108" },
+  4: { label: "Week 4", pages: "pp. 109–144" },
+  5: { label: "Week 5", pages: "pp. 145–171" },
+};
+
+export default function WeekPage({ params }: { params: Promise<{ num: string }> | { num: string } }) {
   // Use React's use() hook to unwrap Promise if needed (Next.js 16)
   const resolvedParams = params instanceof Promise ? use(params) : params;
-  const chapter = useMemo(() => Number(resolvedParams.num), [resolvedParams.num]);
+  const weekNum = useMemo(() => Number(resolvedParams.num), [resolvedParams.num]);
+  const weekInfo = WEEK_INFO[weekNum];
 
   const [comments, setComments] = useState<Comment[]>([]);
   const [name, setName] = useState("");
@@ -28,15 +38,15 @@ export default function ChapterPage({ params }: { params: Promise<{ num: string 
 
   async function load() {
     setStatus(null);
-    const res = await fetch(`/api/comments?chapter=${chapter}`);
+    const res = await fetch(`/api/comments?week=${weekNum}`);
     const data = await res.json();
     setComments(data.comments ?? []);
   }
 
   useEffect(() => {
-    if (Number.isFinite(chapter) && chapter >= 1) load();
+    if (Number.isFinite(weekNum) && weekNum >= 1 && weekNum <= 5) load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chapter]);
+  }, [weekNum]);
 
   async function submit() {
     const magic = getMagicToken();
@@ -50,7 +60,7 @@ export default function ChapterPage({ params }: { params: Promise<{ num: string 
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        chapter,
+        week: weekNum,
         name: name.trim() || undefined,
         text,
         magic,
@@ -69,17 +79,26 @@ export default function ChapterPage({ params }: { params: Promise<{ num: string 
     setComments((prev) => [...prev, data.comment]);
   }
 
-  if (!Number.isInteger(chapter) || chapter < 1) {
+  if (!Number.isInteger(weekNum) || weekNum < 1 || weekNum > 5 || !weekInfo) {
     return (
-      <main style={{ padding: 24 }}>
-        <p>Invalid chapter.</p>
+      <main style={{ padding: 24, maxWidth: 720, margin: "0 auto" }}>
+        <p>Invalid week. Please select a week from 1 to 5.</p>
+        <Link href="/" style={{ color: "inherit", textDecoration: "underline" }}>
+          ← Back to home
+        </Link>
       </main>
     );
   }
 
   return (
     <main style={{ padding: 24, maxWidth: 720, margin: "0 auto" }}>
-      <h1>Chapter {chapter}</h1>
+      <div style={{ marginBottom: 8 }}>
+        <Link href="/" style={{ color: "inherit", textDecoration: "none", fontSize: 14, opacity: 0.8 }}>
+          ← Back to weeks
+        </Link>
+      </div>
+      <h1 style={{ marginTop: 16, marginBottom: 4 }}>{weekInfo.label}</h1>
+      <p style={{ fontSize: 16, opacity: 0.7, marginBottom: 24 }}>{weekInfo.pages}</p>
 
       <section style={{ marginTop: 24 }}>
         <h2>Comments</h2>
